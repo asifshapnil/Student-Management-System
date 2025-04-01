@@ -1,5 +1,5 @@
 const { ApiError, sendAccountVerificationEmail } = require("../../utils");
-const { findAllStudents, findStudentDetail, findStudentToSetStatus, addOrUpdateStudent } = require("./students-repository");
+const { findAllStudents, findStudentDetail, findStudentToSetStatus, addOrUpdateStudent, findStudentToUpdate } = require("./students-repository");
 const { findUserById } = require("../../shared/repository");
 
 const checkStudentId = async (id) => {
@@ -12,7 +12,7 @@ const checkStudentId = async (id) => {
 const getAllStudents = async (payload) => {
     const students = await findAllStudents(payload);
     if (students.length <= 0) {
-        throw new ApiError(404, "Students not found");
+        return [];
     }
 
     return students;
@@ -49,13 +49,37 @@ const addNewStudent = async (payload) => {
     }
 }
 
-const updateStudent = async (payload) => {
-    const result = await addOrUpdateStudent(payload);
-    if (!result.status) {
-        throw new ApiError(500, result.message);
+const updateStudent = async (id, studentData) => {
+    console.log("Service: Update student with ID:", id);
+    console.log("Service: Student data received:", studentData);
+    
+    if (!id) {
+        throw new ApiError(400, "Student ID is required");
     }
-
-    return { message: result.message };
+    
+    await checkStudentId(id);
+    
+    try {
+        const payload = {
+            ...studentData,
+            id: id  
+        };
+        
+        const result = await addOrUpdateStudent(payload);
+        
+        if (!result.status) {
+            throw new Error(result.message || "Failed to update student");
+        }
+        
+        const updatedStudent = await findStudentDetail(id);
+        return { 
+            message: "Student updated successfully",
+            student: updatedStudent
+        };
+    } catch (error) {
+        console.error("Error updating student:", error);
+        throw new ApiError(500, error.message || "Unable to update student");
+    }
 }
 
 const setStudentStatus = async ({ userId, reviewerId, status }) => {
