@@ -167,3 +167,100 @@ INSERT INTO user_profiles
 (user_id, gender, marital_status, phone,dob,join_dt,qualification,experience,current_address,permanent_address,father_name,mother_name,emergency_phone)
 VALUES
 ((SELECT currval('users_id_seq')),'Male','Married','4759746607','2024-08-05',NULL,NULL,NULL,NULL,NULL,'stut','lancy','79374304');
+
+-- Add sample classes
+INSERT INTO classes (name, sections) VALUES 
+('Class 1', 'A,B,C'),
+('Class 2', 'A,B'),
+('Class 3', 'A,B,C'),
+('Class 4', 'A,B'),
+('Class 5', 'A,B,C')
+ON CONFLICT DO NOTHING;
+
+-- Add sections
+INSERT INTO sections (name) VALUES 
+('A'),
+('B'),
+('C')
+ON CONFLICT DO NOTHING;
+
+-- Add some students
+INSERT INTO users (name, email, role_id, is_active, is_email_verified)
+VALUES 
+('John Smith', 'john.smith@example.com', 3, true, true),
+('Emma Johnson', 'emma.johnson@example.com', 3, true, true),
+('Michael Brown', 'michael.brown@example.com', 3, true, true),
+('Sophia Davis', 'sophia.davis@example.com', 3, true, true),
+('William Wilson', 'william.wilson@example.com', 3, true, true)
+ON CONFLICT (email) DO NOTHING;
+
+-- Add student profiles
+INSERT INTO user_profiles (
+    user_id, gender, phone, dob, admission_dt, 
+    class_name, section_name, roll, 
+    current_address, permanent_address,
+    father_name, father_phone, mother_name, mother_phone
+)
+SELECT 
+    id, 'Male', '1234567890', '2010-05-15', '2022-06-01',
+    'Class 1', 'A', 1,
+    '123 Main St', '123 Main St',
+    'Robert Smith', '9876543210', 'Mary Smith', '8765432109'
+FROM users WHERE email = 'john.smith@example.com'
+AND NOT EXISTS (SELECT 1 FROM user_profiles WHERE user_id = (SELECT id FROM users WHERE email = 'john.smith@example.com'));
+
+INSERT INTO user_profiles (
+    user_id, gender, phone, dob, admission_dt, 
+    class_name, section_name, roll, 
+    current_address, permanent_address,
+    father_name, father_phone, mother_name, mother_phone
+)
+SELECT 
+    id, 'Female', '2345678901', '2011-03-22', '2022-06-01',
+    'Class 1', 'B', 2,
+    '456 Oak Ave', '456 Oak Ave',
+    'David Johnson', '8765432109', 'Sarah Johnson', '7654321098'
+FROM users WHERE email = 'emma.johnson@example.com'
+AND NOT EXISTS (SELECT 1 FROM user_profiles WHERE user_id = (SELECT id FROM users WHERE email = 'emma.johnson@example.com'));
+
+INSERT INTO user_profiles (
+    user_id, gender, phone, dob, admission_dt, 
+    class_name, section_name, roll, 
+    current_address, permanent_address,
+    father_name, father_phone, mother_name, mother_phone
+)
+SELECT 
+    id, 'Male', '3456789012', '2010-11-10', '2022-06-01',
+    'Class 2', 'A', 1,
+    '789 Pine Rd', '789 Pine Rd',
+    'James Brown', '7654321098', 'Patricia Brown', '6543210987'
+FROM users WHERE email = 'michael.brown@example.com'
+AND NOT EXISTS (SELECT 1 FROM user_profiles WHERE user_id = (SELECT id FROM users WHERE email = 'michael.brown@example.com'));
+
+INSERT INTO user_profiles (
+    user_id, gender, phone, dob, admission_dt, 
+    class_name, section_name, roll, 
+    current_address, permanent_address,
+    father_name, father_phone, mother_name, mother_phone
+)
+SELECT 
+    id, 'Female', '4567890123', '2011-07-18', '2022-06-01',
+    'Class 2', 'B', 2,
+    '101 Elm St', '101 Elm St',
+    'Thomas Davis', '6543210987', 'Jennifer Davis', '5432109876'
+FROM users WHERE email = 'sophia.davis@example.com'
+AND NOT EXISTS (SELECT 1 FROM user_profiles WHERE user_id = (SELECT id FROM users WHERE email = 'sophia.davis@example.com'));
+
+INSERT INTO user_profiles (
+    user_id, gender, phone, dob, admission_dt, 
+    class_name, section_name, roll, 
+    current_address, permanent_address,
+    father_name, father_phone, mother_name, mother_phone
+)
+SELECT 
+    id, 'Male', '5678901234', '2010-09-30', '2022-06-01',
+    'Class 3', 'A', 1,
+    '202 Maple Dr', '202 Maple Dr',
+    'Charles Wilson', '5432109876', 'Elizabeth Wilson', '4321098765'
+FROM users WHERE email = 'william.wilson@example.com'
+AND NOT EXISTS (SELECT 1 FROM user_profiles WHERE user_id = (SELECT id FROM users WHERE email = 'william.wilson@example.com'));
